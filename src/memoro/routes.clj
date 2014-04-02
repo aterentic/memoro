@@ -1,9 +1,10 @@
 (ns memoro.routes
-  (:use [clojure.string]
+  (:use [clojure.string :only (join)]
         [compojure.core]
         [ring.middleware.json]
         [ring.util.response :only (file-response)])
   (:require [memoro.users :as users]
+            [clojure.data.json :as json]
             [memoro.database :as db]
             [compojure.response :as response]
             [compojure.handler :as handler]
@@ -15,7 +16,7 @@
     (:code user)))
 
 (defn get-users []
-  (str "[" (join ", " (map (fn [user] (str "{ \"code\": \"" (:code user) "\" }"))(db/get-users))) "]"))
+  (json/write-str (db/get-users)))
 
 (defroutes app-routes
   (GET "/users" []
@@ -31,4 +32,3 @@
 
 (def app
   (handler/site app-routes))
-

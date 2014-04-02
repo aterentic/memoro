@@ -1,31 +1,40 @@
 (ns memoro.routes
-  (:use [clojure.string :only (join)]
-        [compojure.core]
-        [ring.middleware.json]
-        [ring.util.response :only (file-response)])
+  (:use [compojure.core])
   (:require [memoro.users :as users]
-            [clojure.data.json :as json]
             [memoro.database :as db]
-            [compojure.response :as response]
+            [clojure.data.json :as json]
             [compojure.handler :as handler]
             [compojure.route :as route]))
+
+(defn json-response [body]
+  {:status 200
+   :headers {"Content-Type" "application/json; charset=UTF-8"}
+   :body body})
+
+(defn see-other [location]
+  {:status 303
+   :headers {"Location" location}})
 
 (defn create-user []
   (let [user (memoro.users/create-user)]
     (db/add-a-user user)
-    (:code user)))
+    user))
 
-(defn get-users []
-  (json/write-str (db/get-users)))
+(defn user-location [user]
+  (str "/user.html?code=" (:code user)))
+
+(defroutes json-routes
+  (GET "/users" []
+       (-> (db/get-users)
+           (json/write-str)
+           (json-response)))
+  (POST "/users" []
+        (-> (create-user)
+            (user-location)
+            (see-other))))
 
 (defroutes app-routes
-  (GET "/users" []
-       {:status 200
-        :headers {"Content-Type" "application/json"}
-        :body (get-users)})
-  (POST "/users" []
-        {:status 303
-         :headers {"Location" (str "/user.html?code=" (create-user))}})
+  (context "/api" [] json-routes)
   (route/files "/" {:root "public"})
   (route/resources "/")
   (route/not-found "Not Found"))

@@ -1,5 +1,25 @@
 body {
   font-family: sans-serif;
-  background-color: black;
+  background-color: lightslategray;
+  color: lightsteelblue;
+}
+
+#boards {
+  background-color: gray;
+}
+
+#new-board {
+  height: 1.2em;
+  padding: 0.3em 0.6em;
+  width: 12em;
+  background-color: dimgray;
+  color: white;
+}
+
+#new-board.empty {
   color: lightgray;
+}
+
+#new-board.empty:hover {
+  cursor: pointer;
 }

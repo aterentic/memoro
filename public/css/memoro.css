@@ -1,25 +1,38 @@
 body {
+  margin: 0em;
+  padding: 0em;
   font-family: sans-serif;
   background-color: lightslategray;
   color: lightsteelblue;
 }
 
 #boards {
-  background-color: gray;
+  float: left;
+  margin: 1em;
+  padding: 0em;
+  list-style: none;
 }
 
-#new-board {
+#boards .board {
+  border: solid 0.2em black;
+  border-radius: 0.4em;
+  float: left;
   height: 1.2em;
   padding: 0.3em 0.6em;
+  margin: 0em 0.3em;
   width: 12em;
   background-color: dimgray;
   color: white;
 }
 
-#new-board.empty {
-  color: lightgray;
+#boards .board:hover {
+  cursor: pointer;
 }
 
-#new-board.empty:hover {
-  cursor: pointer;
+#boards .board.empty {
+  color: gray;
+}
+
+#boards .board.selected {
+  background-color: lightgray;
 }

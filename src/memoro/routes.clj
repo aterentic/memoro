@@ -15,23 +15,34 @@
   {:status 303
    :headers {"Location" location}})
 
-(defn create-user []
-  (let [user (memoro.users/create-user)]
-    (db/add-a-user user)
-    user))
-
 (defn user-location [user]
   (str "/user.html?code=" (:code user)))
+
+(defn user-api-location [user]
+  (str "/api/user/" (:code user)))
+
+(defn create-user []
+  (let [user (memoro.users/create-user)]
+    (db/add-user user)
+    user))
 
 (defroutes json-routes
   (GET "/users" []
        (-> (db/get-users)
            (json/write-str)
            (json-response)))
+  (GET "/user/:code" [code]
+       (-> (db/get-user {:code code})
+           (json/write-str)
+           (json-response)))
   (POST "/users" []
         (-> (create-user)
             (user-location)
-            (see-other))))
+            (see-other)))
+  (POST "/boards" {params :body}
+        (let [board (json/read-str (slurp params) :key-fn keyword)]
+          (db/add-board board)
+          (see-other (user-api-location {:code (:user board)})))))
 
 (defroutes app-routes
   (context "/api" [] json-routes)

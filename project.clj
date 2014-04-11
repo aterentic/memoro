@@ -1,7 +1,7 @@
 (defproject memoro "0.1.0-SNAPSHOT"
   :description "FIXME: write memoro description"
   :url "http://example.com/FIXME"
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/data.json "0.2.4"]
                  [compojure "1.1.6"]

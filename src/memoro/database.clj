@@ -1,5 +1,8 @@
 (ns memoro.database
-  (:use [datomic.api :only (q db) :as d]))
+  (:use
+   [clojure.string :as string :only (split)]
+   [clojure.walk :as walk]
+   [datomic.api :only (q db) :as d]))
 
 (def uri "datomic:mem://memoro")
 
@@ -20,6 +23,7 @@
                           :db/ident :user/boards
                           :db/valueType :db.type/ref
                           :db/cardinality :db.cardinality/many
+                          :db/isComponent true
                           :db/doc "A users's boards"
                           :db.install/_attribute :db.part/db}
                          {:db/id (d/tempid :db.part/db)
@@ -29,12 +33,11 @@
                           :db/doc "Board name"
                           :db.install/_attribute :db.part/db}]))
 
+(defn- strip-namespace [kwd]
+  (keyword (second (string/split (str kwd) #"/"))))
+
 (defn- user-id [user]
   (first (first (d/q '[:find ?user_id :in $ ?code :where [?user_id :user/code ?code]] (read-db) (:code user)))))
-
-(defn- parse-boards [user]
-  (let [boards (:user/boards user)]
-    (map (fn [board] {:name (:board/name board)}) boards)))
 
 (defn make-db []
   (d/create-database uri)
@@ -52,8 +55,9 @@
    (q '[:find ?n :where [?c user/code ?n ]] (read-db))))
 
 (defn get-user [user]
-  (let [e (d/entity (read-db) (user-id user))]
-    { :code (:user/code e) :boards (parse-boards e)}))
+  (walk/postwalk
+   (fn [value] (if (keyword? value) (strip-namespace value) value))
+   (read-string (pr-str (d/touch (d/entity (read-db) (user-id user)))))))
 
 (defn add-board [board]
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :board/name (:name board)}])

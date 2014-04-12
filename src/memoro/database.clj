@@ -31,6 +31,19 @@
                           :db/valueType :db.type/string
                           :db/cardinality :db.cardinality/one
                           :db/doc "Board name"
+                          :db.install/_attribute :db.part/db}
+                         {:db/id (d/tempid :db.part/db)
+                          :db/ident :board/notes
+                          :db/valueType :db.type/ref
+                          :db/cardinality :db.cardinality/many
+                          :db/isComponent true
+                          :db/doc "Board notes"
+                          :db.install/_attribute :db.part/db}
+                         {:db/id (d/tempid :db.part/db)
+                          :db/ident :note/text
+                          :db/valueType :db.type/string
+                          :db/cardinality :db.cardinality/one
+                          :db/doc "Note text"
                           :db.install/_attribute :db.part/db}]))
 
 (defn- strip-namespace [kwd]
@@ -38,6 +51,9 @@
 
 (defn- user-id [user]
   (first (first (d/q '[:find ?user_id :in $ ?code :where [?user_id :user/code ?code]] (read-db) (:code user)))))
+
+(defn- board-id [board]
+       (first (first (d/q '[:find ?board_id :in $ ?user ?name :where [?u :user/code ?user] [?u :user/boards ?board_id] [?board_id :board/name ?name]] (read-db) (:user board) (:name board)))))
 
 (defn make-db []
   (d/create-database uri)
@@ -59,7 +75,17 @@
    (fn [value] (if (keyword? value) (strip-namespace value) value))
    (read-string (pr-str (d/touch (d/entity (read-db) (user-id user)))))))
 
+(defn get-board [board]
+  (walk/postwalk
+   (fn [value] (if (keyword? value) (strip-namespace value) value))
+   (read-string (pr-str (d/touch (d/entity (read-db) (board-id board)))))))
+
 (defn add-board [board]
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :board/name (:name board)}])
         id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
     (d/transact (connect) [{:db/id (user-id {:code (:user board)}) :user/boards id}])))
+
+(defn add-note [note]
+  (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :note/text (:text note)}])
+        id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
+    (d/transact (connect) [{:db/id (board-id {:user (:user note) :name (:board note)}) :board/notes id}])))

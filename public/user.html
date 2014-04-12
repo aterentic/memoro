@@ -8,10 +8,16 @@
     </head>
     <body ng-controller="UserController">
         <ul id="boards">
-            <li memoro-selectable class="board" ng-repeat="board in user.boards">
+            <li class="board{{board.selected}}" ng-click="boardClick($event)" ng-repeat="board in user.boards" data-name="{{board.name}}">
                 {{board.name}}
             </li>
             <li class="board" id="new-board" contenteditable="false"></li>
-        </div>
+        </ul>
+        <ul id="notes">
+            <li class="note" ng-click="noteClick($event)" ng-repeat="note in board.notes">
+                {{note.text}}
+            </li>
+            <li class="note" id="new-note" contenteditable="false"></li>
+        </ul>
     </body>
 </html>

@@ -13,3 +13,8 @@
 (db/delete-db)
 (db/make-db)
 (db/get-users)
+(let [user (users/create-user)]
+  (db/add-user user)
+  (db/add-board {:user (:code user) :name "Default"}))
+
+

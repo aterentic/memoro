@@ -7,10 +7,12 @@ body {
 }
 
 #boards {
-  float: left;
-  margin: 1em;
+  box-sizing: border-box;
+  width: 100%;
   padding: 0em;
+  height: 3em;
   list-style: none;
+  border-bottom: 0.2em solid black;
 }
 
 #boards .board {
@@ -25,6 +27,14 @@ body {
   color: white;
 }
 
+#boards .board:first-child {
+  margin-left: 0.6em;
+}
+
+#boards .board:last-child {
+  margin-left: 0.6em;
+}
+
 #boards .board:hover {
   cursor: pointer;
 }
@@ -35,4 +45,33 @@ body {
 
 #boards .board.selected {
   background-color: lightgray;
+}
+
+#notes {
+  padding: 0em;
+  margin: 0em;
+  list-style: none
+}
+
+#notes .note {
+  border: solid 0.1em dimgray;
+  float: left;
+  height: 4.8em;
+  padding: 0.3em 0.6em;
+  margin: 0.6em;
+  width: 12em;
+  background-color: lightgray;
+  color: black;
+}
+
+#notes .note:hover {
+  cursor: pointer;
+}
+
+#notes .note.empty {
+  color: gray;
+}
+
+#notes .note.selected {
+  background-color: white;
 }

@@ -49,6 +49,14 @@
 (defn- strip-namespace [kwd]
   (keyword (second (string/split (str kwd) #"/"))))
 
+(defn- strip-namespaces [entity]
+  (walk/postwalk
+   (fn [value] (if (keyword? value) (strip-namespace value) value))
+   entity))
+
+(defn- read-entity [eid]
+  (read-string (pr-str (d/touch (d/entity (read-db) eid)))))
+
 (defn- user-id [user]
   (first (first (d/q '[:find ?user_id :in $ ?code :where [?user_id :user/code ?code]] (read-db) (:code user)))))
 
@@ -65,20 +73,16 @@
 (defn add-user [user]
   (d/transact (connect) [{:db/id (d/tempid :db.part/user) :user/code (:code user)}]))
 
+(defn get-user [user]
+  (strip-namespaces (read-entity (user-id user))))
+
 (defn get-users []
   (map
    (fn [code] {:code (first code)})
    (q '[:find ?n :where [?c user/code ?n ]] (read-db))))
 
-(defn get-user [user]
-  (walk/postwalk
-   (fn [value] (if (keyword? value) (strip-namespace value) value))
-   (read-string (pr-str (d/touch (d/entity (read-db) (user-id user)))))))
-
 (defn get-board [board]
-  (walk/postwalk
-   (fn [value] (if (keyword? value) (strip-namespace value) value))
-   (read-string (pr-str (d/touch (d/entity (read-db) (board-id board)))))))
+  (strip-namespaces (read-entity (board-id board))))
 
 (defn add-board [board]
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :board/name (:name board)}])

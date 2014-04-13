@@ -3,21 +3,25 @@
     <head>
         <meta HTTP-EQUIV="content-type" CONTENT="text/html; charset=utf-8">
         <link href="/css/memoro.css" rel="stylesheet" type="text/css" />
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript"></script>
-        <script src="/js/controllers.js" type="text/javascript"></script>
     </head>
     <body ng-controller="UserController">
         <ul id="boards">
-            <li class="board{{board.selected}}" ng-click="boardClick($event)" ng-repeat="board in user.boards" data-name="{{board.name}}">
+            <li class="board{{board.selected}}" ng-click="boardClick($event)" ng-repeat="board in user.boards | orderBy:orderBy" data-name="{{board.name}}">
                 {{board.name}}
             </li>
-            <li class="board" id="new-board" contenteditable="false"></li>
+            <li class="board empty" id="new-board" contenteditable="false" ng-click="newBoardClick($event)" ng-keydown="newBoardKeydown($event)" ng-blur="newBoardBlur($event)">
+                {{newBoardText}}
+            </li>
         </ul>
         <ul id="notes">
-            <li class="note" ng-click="noteClick($event)" ng-repeat="note in board.notes">
+            <li class="note " ng-click="noteClick($event)" ng-repeat="note in board.notes | orderBy:orderBy">
                 {{note.text}}
             </li>
-            <li class="note" id="new-note" contenteditable="false"></li>
+            <li class="note empty" id="new-note" contenteditable="false" ng-click="newNoteClick($event)" ng-keydown="newNoteKeydown($event)" ng-blur="newNoteBlur($event)">
+                {{newNoteText}}
+            </li>
         </ul>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript"></script>
+        <script src="/js/controllers.js" type="text/javascript"></script>
     </body>
 </html>

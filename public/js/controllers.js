@@ -1,4 +1,3 @@
-
 // TODO Global scope, move to module scope.
 function array(nodes) {
   return Array.prototype.slice.call(nodes);
@@ -21,7 +20,6 @@ function select(element) {
   element.classList.add("selected");
 }
 
-
 function getSelectedBoard() {
   return document.querySelector("li.board.selected").getAttribute("data-name");
 }
@@ -38,6 +36,8 @@ memoro.controller('UsersController', function ($scope, $http) {
 
 memoro.controller('UserController', function ($scope, $http) {
 
+  $scope.orderBy = "id";
+
   $http.get('api/user/' + param("code")).success(function(data) {
     $scope.user = data;
     if(data.boards) {
@@ -53,20 +53,16 @@ memoro.controller('UserController', function ($scope, $http) {
     });
   };
 
-  var text = "Add new board...";
+  $scope.newBoardText = "Add new board...";
 
-  var board = document.getElementById("new-board");
-  board.innerHTML = text;
-  board.classList.add("empty");
-
-  board.addEventListener("keydown", function(event) {
+  $scope.newBoardKeydown = function(event) {
     if (event.keyCode == 13) {
       event.preventDefault();
       if (!event.target.classList.contains("empty")) {
         $http.post('/api/boards', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
           $scope.user = data;
           event.target.classList.add("empty");
-          event.target.innerHTML = text;
+          event.target.innerHTML = $scope.newBoardText;
           event.target.contentEditable = false;
           $scope.board = data.boards[0];
           $scope.board.selected = " selected";
@@ -74,65 +70,61 @@ memoro.controller('UserController', function ($scope, $http) {
       }
       return false;
     }
-  });
+  };
 
-  board.addEventListener("click", function(event) {
+  $scope.newBoardClick = function(event) {
     if (event.target.classList.contains("empty")) {
       event.target.innerHTML  = "";
       event.target.classList.remove("empty");
       event.target.contentEditable = true;
       event.target.focus();
     }
-  });
+  };
 
-  board.addEventListener("blur", function(event) {
+  $scope.newBoardBlur = function(event) {
     if (event.target.innerHTML == "") {
       event.target.classList.add("empty");
-      event.target.innerHTML = text;
+      event.target.innerHTML = $scope.newBoardText;
       event.target.contentEditable = false;
     }
-  });
+  };
 
-  var noteText = "Add new note...";
+  $scope.newNoteText = "Add new note...";
 
-  var note = document.getElementById("new-note");
-  note.innerHTML = noteText;
-  note.classList.add("empty");
-
-  note.addEventListener("keydown", function(event) {
+  $scope.newNoteKeydown =function(event) {
     if (event.keyCode == 13) {
       event.preventDefault();
       if (!event.target.classList.contains("empty")) {
         $http.post('/api/notes', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
           $scope.board = data;
           event.target.classList.add("empty");
-          event.target.innerHTML = noteText;
+          event.target.innerHTML = $scope.newNoteText;
           event.target.contentEditable = false;
         });
       }
       return false;
     }
-  });
+  };
 
-  note.addEventListener("click", function(event) {
+  $scope.newNoteClick = function(event) {
     if (event.target.classList.contains("empty")) {
       event.target.innerHTML  = "";
       event.target.classList.remove("empty");
       event.target.contentEditable = true;
       event.target.focus();
     }
-  });
+  };
 
-  note.addEventListener("blur", function(event) {
+  $scope.newNoteBlur = function(event) {
     if (event.target.innerHTML == "") {
       event.target.classList.add("empty");
-      event.target.innerHTML = noteText;
+      event.target.innerHTML = $scope.newNoteText;
       event.target.contentEditable = false;
     }
-  });
+  };
 
   $scope.noteClick = function($event) {
     select($event.target);
-  }
+  };
 
 });

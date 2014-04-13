@@ -4,11 +4,8 @@
    [memoro.database :as db]
    [memoro.users :as users]))
 
-(comment
-  (ws/start)
-  (ws/stop))
-(comment
-  (db/delete-db))
+;;(ws/start)
+;;(ws/stop)
 
 (db/delete-db)
 (db/make-db)
@@ -16,5 +13,3 @@
 (let [user (users/create-user)]
   (db/add-user user)
   (db/add-board {:user (:code user) :name "Default"}))
-
-

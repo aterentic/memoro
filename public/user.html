@@ -9,7 +9,7 @@
             <li class="board{{board.selected}}" ng-click="boardClick($event)" ng-repeat="board in user.boards | orderBy:orderBy" data-name="{{board.name}}">
                 {{board.name}}
             </li>
-            <li class="board empty" id="new-board" contenteditable="false" ng-click="newBoardClick($event)" ng-keydown="newBoardKeydown($event)" ng-blur="newBoardBlur($event)">
+            <li class="board empty" id="new-board" contenteditable="false" ng-click="newBoardClick($event)" ng-keydown="newBoardKeydown($event)" ng-blur="newBoardBlur($event)" ng-keypress="newBoardKeypress($event)">
                 {{newBoardText}}
             </li>
         </ul>
@@ -17,7 +17,7 @@
             <li class="note " ng-click="noteClick($event)" ng-repeat="note in board.notes | orderBy:orderBy">
                 {{note.text}}
             </li>
-            <li class="note empty" id="new-note" contenteditable="false" ng-click="newNoteClick($event)" ng-keydown="newNoteKeydown($event)" ng-blur="newNoteBlur($event)">
+            <li class="note empty" id="new-note" contenteditable="false" ng-click="newNoteClick($event)" ng-keydown="newNoteKeydown($event)" ng-blur="newNoteBlur($event)" ng-keypress="newNoteKeypress($event)">
                 {{newNoteText}}
             </li>
         </ul>

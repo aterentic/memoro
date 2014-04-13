@@ -72,6 +72,12 @@ memoro.controller('UserController', function ($scope, $http) {
     }
   };
 
+  $scope.newBoardKeypress = function(event) {
+    if (event.keyCode == 13) {
+      event.preventDefault();
+    }
+  };
+
   $scope.newBoardClick = function(event) {
     if (event.target.classList.contains("empty")) {
       event.target.innerHTML  = "";
@@ -103,6 +109,12 @@ memoro.controller('UserController', function ($scope, $http) {
         });
       }
       return false;
+    }
+  };
+
+  $scope.newNoteKeypress = function(event) {
+    if (event.keyCode == 13) {
+      event.preventDefault();
     }
   };
 

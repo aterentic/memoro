@@ -6,6 +6,11 @@ body {
   color: lightsteelblue;
 }
 
+body.index {
+  padding: 1em;
+  text-align: center;
+}
+
 #boards {
   box-sizing: border-box;
   width: 100%;

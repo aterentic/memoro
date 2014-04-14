@@ -1,6 +1,10 @@
 # memoro
 
-FIXME
+Two brains are smarter than one!
+
+Another notes.
+
+Angular.js front end, Clojure and Datomic backend.
 
 ## Prerequisites
 
@@ -16,4 +20,4 @@ To start a web server for the application, run:
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 Untitled

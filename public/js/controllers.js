@@ -36,6 +36,23 @@ memoro.controller('UsersController', function ($scope, $http) {
 
 memoro.controller('UserController', function ($scope, $http) {
 
+  function makeEditable(element) {
+    element.innerHTML  = "";
+    element.classList.remove("empty");
+    element.contentEditable = true;
+    element.focus();
+  }
+
+  function makeEmpty(element, tip) {
+    element.classList.add("empty");
+    element.innerHTML = tip;
+    element.contentEditable = false;
+  }
+
+  function isEmpty(element) {
+    return element.classList.contains("empty");
+  }
+
   $scope.orderBy = "id";
 
   $http.get('api/user/' + param("code")).success(function(data) {
@@ -56,20 +73,19 @@ memoro.controller('UserController', function ($scope, $http) {
   $scope.newBoardText = "Add new board...";
 
   $scope.newBoardKeydown = function(event) {
-    if (event.keyCode == 13) {
-      event.preventDefault();
-      if (!event.target.classList.contains("empty")) {
-        $http.post('/api/boards', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
-          $scope.user = data;
-          event.target.classList.add("empty");
-          event.target.innerHTML = $scope.newBoardText;
-          event.target.contentEditable = false;
-          $scope.board = data.boards[0];
-          $scope.board.selected = " selected";
-        });
-      }
-      return false;
+    if (event.keyCode != 13) {
+      return true;
     }
+    event.preventDefault();
+    if (!isEmpty(event.target)) {
+      $http.post('/api/boards', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
+        makeEmpty(event.target, $scope.newBoardText);
+        $scope.user = data;
+        $scope.board = data.boards[0];
+        $scope.board.selected = " selected";
+      });
+    }
+    return false;
   };
 
   $scope.newBoardKeypress = function(event) {
@@ -79,37 +95,31 @@ memoro.controller('UserController', function ($scope, $http) {
   };
 
   $scope.newBoardClick = function(event) {
-    if (event.target.classList.contains("empty")) {
-      event.target.innerHTML  = "";
-      event.target.classList.remove("empty");
-      event.target.contentEditable = true;
-      event.target.focus();
+    if (isEmpty(event.target)) {
+      makeEditable(event.target);
     }
   };
 
   $scope.newBoardBlur = function(event) {
     if (event.target.innerHTML == "") {
-      event.target.classList.add("empty");
-      event.target.innerHTML = $scope.newBoardText;
-      event.target.contentEditable = false;
+      makeEmpty(event.target, $scope.newBoardText);
     }
   };
 
   $scope.newNoteText = "Add new note...";
 
   $scope.newNoteKeydown =function(event) {
-    if (event.keyCode == 13) {
-      event.preventDefault();
-      if (!event.target.classList.contains("empty")) {
-        $http.post('/api/notes', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
-          $scope.board = data;
-          event.target.classList.add("empty");
-          event.target.innerHTML = $scope.newNoteText;
-          event.target.contentEditable = false;
-        });
-      }
-      return false;
+    if (event.keyCode != 13) {
+      return true;
     }
+    event.preventDefault();
+    if (!isEmpty(event.target)) {
+      $http.post('/api/notes', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
+        makeEmpty(event.target, $scope.newNoteText);
+        $scope.board = data;
+      });
+    }
+    return false;
   };
 
   $scope.newNoteKeypress = function(event) {
@@ -120,18 +130,13 @@ memoro.controller('UserController', function ($scope, $http) {
 
   $scope.newNoteClick = function(event) {
     if (event.target.classList.contains("empty")) {
-      event.target.innerHTML  = "";
-      event.target.classList.remove("empty");
-      event.target.contentEditable = true;
-      event.target.focus();
+      makeEditable(event.target);
     }
   };
 
   $scope.newNoteBlur = function(event) {
     if (event.target.innerHTML == "") {
-      event.target.classList.add("empty");
-      event.target.innerHTML = $scope.newNoteText;
-      event.target.contentEditable = false;
+      makeEmpty(event.target, $scope.newNoteText);
     }
   };
 

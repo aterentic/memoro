@@ -24,17 +24,13 @@ function getSelectedBoard() {
   return document.querySelector("li.board.selected").getAttribute("data-name");
 }
 
-var memoro = angular.module('memoro', []);
+var controllers = angular.module('memoroControllers', []);
 
-memoro.controller('UsersController', function ($scope, $http) {
+controllers.controller('UsersController', ['$scope', 'Users', function ($scope, Users) {
+  $scope.users = Users.query();
+}]);
 
-  $http.get('api/users').success(function(data) {
-    $scope.users = data;
-  });
-
-});
-
-memoro.controller('UserController', function ($scope, $http) {
+controllers.controller('UserController', function ($scope, $http) {
 
   function makeEditable(element) {
     element.innerHTML  = "";

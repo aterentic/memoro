@@ -30,7 +30,7 @@
     user))
 
 (defroutes json-routes
-  (GET "/users" []
+  (GET "/user" []
        (-> (db/get-users)
            (json/write-str)
            (json-response)))
@@ -42,15 +42,15 @@
        (-> (db/get-board {:user user :name name})
            (json/write-str)
            (json-response)))
-  (POST "/users" []
+  (POST "/user" []
         (-> (create-user)
             (user-location)
             (see-other)))
-  (POST "/boards" {params :body}
+  (POST "/board" {params :body}
         (let [board (json/read-str (slurp params) :key-fn keyword)]
           (db/add-board board)
           (see-other (user-api-location {:code (:user board)}))))
-  (POST "/notes" {params :body}
+  (POST "/note" {params :body}
         (let [note (json/read-str (slurp params) :key-fn keyword)]
           (println note)
           (db/add-note note)

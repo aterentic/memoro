@@ -26,7 +26,7 @@ function getSelectedBoard() {
 
 var controllers = angular.module('memoroControllers', []);
 
-controllers.controller('UsersController', ['$scope', 'Users', function ($scope, Users) {
+controllers.controller('UsersController', ['$scope', 'User', function ($scope, User) {
   $scope.users = Users.query();
 }]);
 
@@ -71,7 +71,7 @@ controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', fu
     }
     event.preventDefault();
     if (!isEmpty(event.target)) {
-      $http.post('/api/boards', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
+      $http.post('/api/board', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
         makeEmpty(event.target, $scope.newBoardText);
         $scope.user = data;
         $scope.board = data.boards[0];
@@ -107,7 +107,7 @@ controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', fu
     }
     event.preventDefault();
     if (!isEmpty(event.target)) {
-      $http.post('/api/notes', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
+      $http.post('/api/note', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
         makeEmpty(event.target, $scope.newNoteText);
         $scope.board = data;
       });

@@ -30,7 +30,7 @@ controllers.controller('UsersController', ['$scope', 'Users', function ($scope, 
   $scope.users = Users.query();
 }]);
 
-controllers.controller('UserController', function ($scope, $http) {
+controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', function ($scope, $http, User, Board) {
 
   function makeEditable(element) {
     element.innerHTML  = "";
@@ -51,19 +51,16 @@ controllers.controller('UserController', function ($scope, $http) {
 
   $scope.orderBy = "id";
 
-  $http.get('api/user/' + param("code")).success(function(data) {
-    $scope.user = data;
-    if(data.boards) {
-      $scope.board = data.boards[0];
+  $scope.user = User.get({"code" : param("code")}, function(user) {
+    if (user.boards) {
+      $scope.board = user.boards[0];
       $scope.board.selected = " selected";
-    }
+    };
   });
 
   $scope.boardClick = function($event) {
     select($event.target);
-    $http.get('/api/user/' + param("code") + "/board/" + getSelectedBoard()).success(function(data) {
-      $scope.board = data;
-    });
+    $scope.board = Board.get({ "code" : param("code"), "name" : getSelectedBoard()});
   };
 
   $scope.newBoardText = "Add new board...";
@@ -140,4 +137,4 @@ controllers.controller('UserController', function ($scope, $http) {
     select($event.target);
   };
 
-});
+}]);

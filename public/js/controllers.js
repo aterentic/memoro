@@ -71,11 +71,18 @@ controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', fu
     }
     event.preventDefault();
     if (!isEmpty(event.target)) {
-      $http.post('/api/board', { "user": param("code"), "name": event.target.innerHTML }).success(function(data) {
-        makeEmpty(event.target, $scope.newBoardText);
-        $scope.user = data;
-        $scope.board = data.boards[0];
-        $scope.board.selected = " selected";
+      new Board({ "code" : param("code"), "user" : param("code"), "name" : event.target.innerHTML }).$save(function(board) {
+        User.get({ "code" : param("code") }, function(user) {
+          $scope.user = user;
+          array(user.boards).forEach(function(candidate) {
+            if (candidate.name == board.name) {
+              $scope.board = candidate;
+              $scope.board.selected = " selected";
+              return false;
+            }
+          });
+          makeEmpty(event.target, $scope.newBoardText);
+        });
       });
     }
     return false;

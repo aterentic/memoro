@@ -46,10 +46,10 @@
         (-> (create-user)
             (user-location)
             (see-other)))
-  (POST "/board" {params :body}
+  (POST "/user/:user/board" {params :body}
         (let [board (json/read-str (slurp params) :key-fn keyword)]
           (db/add-board board)
-          (see-other (user-api-location {:code (:user board)}))))
+          (see-other (board-api-location board))))
   (POST "/note" {params :body}
         (let [note (json/read-str (slurp params) :key-fn keyword)]
           (println note)

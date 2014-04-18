@@ -5,5 +5,5 @@ services.factory('User', ['$resource', function($resource) {
 }]);
 
 services.factory('Board', ['$resource', function($resource) {
-  return $resource('api/user/:code/board/:name');
+  return $resource('api/user/:code/board/:name', {code: '@user'});
 }]);

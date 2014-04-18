@@ -27,7 +27,7 @@ function getSelectedBoard() {
 var controllers = angular.module('memoroControllers', []);
 
 controllers.controller('UsersController', ['$scope', 'User', function ($scope, User) {
-  $scope.users = Users.query();
+  $scope.users = User.query();
 }]);
 
 controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', function ($scope, $http, User, Board) {

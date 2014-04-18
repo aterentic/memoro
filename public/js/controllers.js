@@ -30,7 +30,7 @@ controllers.controller('UsersController', ['$scope', 'User', function ($scope, U
   $scope.users = User.query();
 }]);
 
-controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', function ($scope, $http, User, Board) {
+controllers.controller('UserController', ['$scope', 'User', 'Board', 'Note', function ($scope, User, Board, Note) {
 
   function makeEditable(element) {
     element.innerHTML  = "";
@@ -71,7 +71,7 @@ controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', fu
     }
     event.preventDefault();
     if (!isEmpty(event.target)) {
-      new Board({ "code" : param("code"), "user" : param("code"), "name" : event.target.innerHTML }).$save(function(board) {
+      new Board({ "user" : param("code"), "name" : event.target.innerHTML }).$save(function(board) {
         User.get({ "code" : param("code") }, function(user) {
           $scope.user = user;
           array(user.boards).forEach(function(candidate) {
@@ -114,9 +114,9 @@ controllers.controller('UserController', ['$scope', '$http', 'User', 'Board', fu
     }
     event.preventDefault();
     if (!isEmpty(event.target)) {
-      $http.post('/api/note', { "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).success(function(data) {
+      new Note({ "user": param("code"), "board" : getSelectedBoard(), "text": event.target.innerHTML }).$save(function(note) {
         makeEmpty(event.target, $scope.newNoteText);
-        $scope.board = data;
+        $scope.board = Board.get({ "code": param("code"), "name" : getSelectedBoard()});
       });
     }
     return false;

@@ -53,6 +53,9 @@
 (defn get-board [board]
   (strip-namespaces (read-entity (board-id board))))
 
+(defn get-note [id]
+  (strip-namespaces (read-entity id)))
+
 (defn add-board [board]
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :board/name (:name board)}])
         id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
@@ -61,4 +64,4 @@
 (defn add-note [note]
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :note/text (:text note)}])
         id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
-    (d/transact (connect) [{:db/id (board-id {:user (:user note) :name (:board note)}) :board/notes id}])))
+    (d/transact (connect) [{:db/id (board-id {:user (:user note) :name (:board note)}) :board/notes id}]) id))

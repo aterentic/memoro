@@ -24,6 +24,9 @@
 (defn board-api-location [board]
   (str "/api/user/" (:user board) "/board/" (:name board)))
 
+(defn note-api-location [note]
+  (str "/api/user/" (:user note) "/board/" (:board note) "/note/" (:id note)))
+
 (defn create-user []
   (let [user (memoro.users/create-user)]
     (db/add-user user)
@@ -42,6 +45,10 @@
        (-> (db/get-board {:user user :name name})
            (json/write-str)
            (json-response)))
+  (GET "/user/:user/board/:name/note/:id" [user name id]
+       (-> (db/get-note (bigint id))
+           (json/write-str)
+           (json-response)))
   (POST "/user" []
         (-> (create-user)
             (user-location)
@@ -50,11 +57,10 @@
         (let [board (json/read-str (slurp params) :key-fn keyword)]
           (db/add-board board)
           (see-other (board-api-location board))))
-  (POST "/note" {params :body}
-        (let [note (json/read-str (slurp params) :key-fn keyword)]
-          (println note)
-          (db/add-note note)
-          (see-other (board-api-location {:user (:user note) :name (:board note)})))))
+  (POST "/user/:user/board/:name/note" {params :body}
+        (let [data (json/read-str (slurp params) :key-fn keyword)
+              note (merge {:id (db/add-note data)} data)]
+          (see-other (note-api-location note)))))
 
 (defroutes app-routes
   (context "/api" [] json-routes)

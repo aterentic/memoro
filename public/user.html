@@ -5,8 +5,8 @@
         <link href="/css/memoro.css" rel="stylesheet" type="text/css" />
     </head>
     <body ng-controller="UserController">
-        <ul id="boards">
-            <li class="board{{board.selected}}" ng-click="boardClick($event)" ng-repeat="board in user.boards | orderBy:orderBy" data-name="{{board.name}}">
+        <ul id="boards" ng-mousedown="boardsMouseDown($event)" ng-mouseup="boardsMouseUp($event)" ng-mousemove="boardsMouseMove($event)">
+            <li class="board{{board.selected}}" ng-mousedown="boardMouseDown($event)" ng-click="boardClick($event)" ng-repeat="board in user.boards | orderBy:orderBy" data-name="{{board.name}}">
                 {{board.name}}
             </li>
             <li class="board empty" id="new-board" contenteditable="false" ng-click="newBoardClick($event)" ng-keydown="newBoardKeydown($event)" ng-blur="newBoardBlur($event)" ng-keypress="newBoardKeypress($event)">

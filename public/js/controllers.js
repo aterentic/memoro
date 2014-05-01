@@ -32,14 +32,39 @@ controllers.controller('UsersController', ['$scope', 'User', function ($scope, U
 
 controllers.controller('UserController', ['$scope', 'User', 'Board', 'Note', function ($scope, User, Board, Note) {
 
+  var move = false;
+  var prevousX = 0;
+
+  $scope.boardsMouseDown = function($event) {
+    prevousX = $event.clientX;
+    move = true;
+    $event.preventDefault();
+  }
+
+  $scope.boardsMouseUp = function($event) {
+    move = false;
+  }
+
+  $scope.boardsMouseMove = function($event) {
+    if (!move) return false;
+    document.querySelector("#boards").scrollLeft -= $event.clientX - prevousX;
+    prevousX = $event.clientX;
+  }
+
+  $scope.boardMouseDown = function($event) {
+    $event.preventDefault();
+  }
+
   function makeEditable(element) {
-    element.innerHTML  = "";
     element.classList.remove("empty");
+    element.classList.add("edit");
     element.contentEditable = true;
     element.focus();
+    element.innerHTML  = "";
   }
 
   function makeEmpty(element, tip) {
+    element.classList.remove("edit");
     element.classList.add("empty");
     element.innerHTML = tip;
     element.contentEditable = false;

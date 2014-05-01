@@ -1,8 +1,8 @@
 body {
   margin: 0em;
   padding: 0em;
-  font-family: sans-serif;
-  background-color: lightslategray;
+  font-family: Gill Sans, sans-serif;
+  background-color: #667e98;
   color: lightsteelblue;
 }
 
@@ -12,44 +12,51 @@ body.index {
 }
 
 #boards {
-  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(56,70,84,0.5) 0%, rgba(125,185,232,0) 100%);
+  display: block;
+  overflow: hidden;
   width: 100%;
   padding: 0em;
-  height: 3em;
+  margin: 0em;
   list-style: none;
-  border-bottom: 0.2em solid black;
+  white-space: nowrap;
+  border-bottom: 0.18em solid #384654;
 }
 
 #boards .board {
-  border: solid 0.2em black;
+  display: inline-block;
+  border: solid 0.18em #384654;
   border-radius: 0.4em;
-  float: left;
-  height: 1.2em;
-  padding: 0.3em 0.6em;
-  margin: 0em 0.3em;
-  width: 12em;
-  background-color: dimgray;
+  height: 1.8em;
+  padding: 0.6em 1.2em 0em 1.2em;
+  margin: 1.2em 0em 1.2em 0.6em;
+  background-color: #acb6bf;
+  box-shadow: inset 0 0 1em #607080;
   color: white;
 }
 
 #boards .board:first-child {
-  margin-left: 0.6em;
+  margin-left: 1.2em;
 }
 
 #boards .board:last-child {
-  margin-left: 0.6em;
+  margin-right: 1.2em;
 }
 
-#boards .board:hover {
+#boards .board:hover, #boards .board.selected:hover {
+  color: #607080;
+  box-shadow: inset 0 0 1em white;
   cursor: pointer;
 }
 
-#boards .board.empty {
+#boards .board.empty, #boards .board.edit {
   color: gray;
+  min-width: 9em;
 }
 
 #boards .board.selected {
-  background-color: lightgray;
+  color: #607080;
+  box-shadow: inset 0 0 1em #e6e4c3;
 }
 
 #notes {

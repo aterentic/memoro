@@ -63,10 +63,11 @@
           (see-other (note-api-location note)))))
 
 (defroutes app-routes
-  (context "/api" [] json-routes)
   (route/files "/" {:root "public"})
   (route/resources "/")
   (route/not-found "Not Found"))
 
 (def app
-  (handler/site app-routes))
+  (routes
+   (handler/api (context "/api" [] json-routes))
+   (handler/site app-routes)))

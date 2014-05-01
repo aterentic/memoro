@@ -24,6 +24,7 @@ body.index {
 }
 
 #boards .board {
+  vertical-align: bottom;
   display: inline-block;
   border: solid 0.18em #384654;
   border-radius: 0.4em;

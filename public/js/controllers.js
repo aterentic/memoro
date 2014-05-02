@@ -45,6 +45,10 @@ controllers.controller('UserController', ['$scope', 'User', 'Board', 'Note', fun
     move = false;
   }
 
+  $scope.boardsMouseOut = function($event) {
+    move = false;
+  }
+
   $scope.boardsMouseMove = function($event) {
     if (!move) return false;
     document.querySelector("#boards").scrollLeft -= $event.clientX - prevousX;

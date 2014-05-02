@@ -1,15 +1,12 @@
 (ns memoro.routes
-  (:use [compojure.core])
+  (:use [compojure.core]
+        [ring.middleware.json :only [wrap-json-response]]
+        [ring.util.response :only [response]])
   (:require [memoro.users :as users]
             [memoro.database :as db]
             [clojure.data.json :as json]
             [compojure.handler :as handler]
             [compojure.route :as route]))
-
-(defn json-response [body]
-  {:status 200
-   :headers {"Content-Type" "application/json; charset=UTF-8"}
-   :body body})
 
 (defn see-other [location]
   {:status 303
@@ -34,21 +31,13 @@
 
 (defroutes json-routes
   (GET "/user" []
-       (-> (db/get-users)
-           (json/write-str)
-           (json-response)))
+       (response (db/get-users)))
   (GET "/user/:code" [code]
-       (-> (db/get-user {:code code})
-           (json/write-str)
-           (json-response)))
+       (response (db/get-user {:code code})))
   (GET "/user/:user/board/:name" [user name]
-       (-> (db/get-board {:user user :name name})
-           (json/write-str)
-           (json-response)))
+       (response (db/get-board {:user user :name name})))
   (GET "/user/:user/board/:name/note/:id" [user name id]
-       (-> (db/get-note (bigint id))
-           (json/write-str)
-           (json-response)))
+       (response (db/get-note (bigint id))))
   (POST "/user" []
         (-> (create-user)
             (user-location)
@@ -69,5 +58,7 @@
 
 (def app
   (routes
-   (handler/api (context "/api" [] json-routes))
+   (-> (context "/api" [] json-routes)
+       (handler/api)
+       (wrap-json-response))
    (handler/site app-routes)))

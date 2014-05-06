@@ -23,6 +23,10 @@ body.index {
   border-bottom: 0.18em solid #384654;
 }
 
+#boards:hover {
+  cursor: move;
+}
+
 #boards .board {
   vertical-align: bottom;
   display: inline-block;

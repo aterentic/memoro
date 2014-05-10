@@ -49,7 +49,12 @@
   (POST "/user/:user/board/:name/note" {params :body}
         (let [data (json/read-str (slurp params) :key-fn keyword)
               note (merge {:id (db/add-note data)} data)]
-          (see-other (note-api-location note)))))
+          (see-other (note-api-location note))))
+  (POST "/user/:user/board/:name/note/:id" {params :body}
+       (let [note (json/read-str (slurp params) :key-fn keyword)]
+         (println note)
+             (db/add-note-item (:id note) (:text note))
+         (see-other (note-api-location note)))))
 
 (defroutes app-routes
   (route/files "/" {:root "public"})

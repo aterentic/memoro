@@ -75,7 +75,6 @@ body.index {
 #notes .note {
   border: solid 0.1em dimgray;
   float: left;
-  height: 4.8em;
   padding: 0.6em 1.2em;
   margin-right: 1.2em;
   margin-bottom: 1.2em;
@@ -86,12 +85,17 @@ body.index {
   font-weight: bold;
 }
 
+#notes .note .item {
+  height: 1.2em;
+}
+
 #notes .note:hover {
   cursor: pointer;
 }
 
-#notes .note.empty {
+#notes .note.empty, #notes .note.edit {
   color: gray;
+  height: 1.2em;
 }
 
 #notes .note.selected {

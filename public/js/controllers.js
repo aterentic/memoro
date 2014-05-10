@@ -173,4 +173,28 @@ controllers.controller('UserController', ['$scope', 'User', 'Board', 'Note', fun
     select($event.target);
   };
 
+  $scope.newItemKeyDown = function(event) {
+    if (event.keyCode != 13) {
+      return true;
+    }
+    event.preventDefault();
+    if (!isEmpty(event.target)) {
+      var id = event.target.parentNode.parentNode.getAttribute("data-memoro-id");
+      Note.get({"code": param("code"), "name" : getSelectedBoard(), "id" : id}, function(note) {
+        note.text = event.target.innerHTML;
+        note.$save({"code": param("code"), "name" : getSelectedBoard()});
+        $scope.board = Board.get({ "code": param("code"), "name" : getSelectedBoard()});
+      });
+    }
+    return false;
+  }
+
+  $scope.newItemKeyPress = function(event) {
+    if (event.keyCode != 13) {
+      return true;
+    }
+    event.preventDefault();
+    return false;
+  }
+
 }]);

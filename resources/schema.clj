@@ -27,6 +27,6 @@
  {:db/id #db/id[:db.part/db]
   :db/ident :note/text
   :db/valueType :db.type/string
-  :db/cardinality :db.cardinality/one
+  :db/cardinality :db.cardinality/many
   :db/doc "Note text"
   :db.install/_attribute :db.part/db}]

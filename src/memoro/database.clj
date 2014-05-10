@@ -65,3 +65,7 @@
   (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :note/text (:text note)}])
         id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
     (d/transact (connect) [{:db/id (board-id {:user (:user note) :name (:board note)}) :board/notes id}]) id))
+
+(defn add-note-item [note-id text]
+  (let [note (d/entity (read-db) note-id)]
+    (d/transact (connect) [{:db/id note-id :note/text text}])))

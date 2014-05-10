@@ -14,8 +14,11 @@
             </li>
         </ul>
         <ul id="notes">
-            <li class="note" ng-click="noteClick($event)" ng-repeat="note in board.notes | orderBy:orderBy">
-                <ul><li>{{note.text}}</li></ul>
+            <li data-memoro-id="{{note.id}}" class="note" ng-click="noteClick($event)" ng-repeat="note in board.notes | orderBy:orderBy">
+                <ul>
+                    <li class="item" ng-repeat="item in note.text">{{item}}</li>
+                    <li class="item" contenteditable="true" ng-keydown="newItemKeyDown($event)" ng-keypress="newItemKeypress($event)"></li>
+                </ul>
             </li>
             <li class="note empty" id="new-note" contenteditable="false" ng-click="newNoteClick($event)" ng-keydown="newNoteKeydown($event)" ng-blur="newNoteBlur($event)" ng-keypress="newNoteKeypress($event)">
                 {{newNoteText}}

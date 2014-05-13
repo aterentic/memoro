@@ -4,8 +4,8 @@
    [memoro.database :as db]
    [memoro.users :as users]))
 
-;;(ws/start)
-;;(ws/stop)
+(ws/stop)
+(ws/start)
 
 (db/delete-db)
 (db/make-db)

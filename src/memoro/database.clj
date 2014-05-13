@@ -30,7 +30,7 @@
   (first (first (d/q '[:find ?user_id :in $ ?code :where [?user_id :user/code ?code]] (read-db) (:code user)))))
 
 (defn- board-id [board]
-       (first (first (d/q '[:find ?board_id :in $ ?user ?name :where [?u :user/code ?user] [?u :user/boards ?board_id] [?board_id :board/name ?name]] (read-db) (:user board) (:name board)))))
+  (first (first (d/q '[:find ?board_id :in $ ?user ?name :where [?u :user/code ?user] [?u :user/boards ?board_id] [?board_id :board/name ?name]] (read-db) (:user board) (:name board)))))
 
 (defn make-db []
   (d/create-database uri)
@@ -57,15 +57,18 @@
   (strip-namespaces (read-entity id)))
 
 (defn add-board [board]
-  (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :board/name (:name board)}])
-        id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
-    (d/transact (connect) [{:db/id (user-id {:code (:user board)}) :user/boards id}])))
+  (let [temp-id (d/tempid :db.part/user)
+        board-name (:name board)
+        user-id (user-id {:code (:user board)})]
+    (d/transact (connect) [{:db/id temp-id :board/name board-name}
+                           {:db/id user-id :user/boards temp-id}])))
 
 (defn add-note [note]
-  (let [tx @(d/transact (connect) [{:db/id (d/tempid :db.part/user) :note/text (:text note)}])
-        id (d/resolve-tempid (read-db) (:tempids tx) (ffirst (:tempids tx)))]
-    (d/transact (connect) [{:db/id (board-id {:user (:user note) :name (:board note)}) :board/notes id}]) id))
-
+  (let [note-id (d/tempid :db.part/user)
+        note-text (:text note)
+        board-id (board-id {:user (:user note) :name (:board note)})]
+    (d/resolve-tempid (read-db) (:tempids @(d/transact (connect) [{:db/id note-id :note/text note-text}
+                                                                  {:db/id board-id :board/notes note-id}])) note-id)))
 (defn add-note-item [note-id text]
   (let [note (d/entity (read-db) note-id)]
     (d/transact (connect) [{:db/id note-id :note/text text}])))

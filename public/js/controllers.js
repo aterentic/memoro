@@ -24,6 +24,43 @@ function getSelectedBoard() {
   return document.querySelector("li.board.selected").getAttribute("data-name");
 }
 
+var directives = angular.module('memoroDirectives', []);
+
+directives.directive('memoroDraggable', ['$document', function($document) {
+
+  return function(scope, element, attr) {
+
+    var move = false;
+    var prevousX = 0;
+
+    element.on('mousedown', function(event) {
+      prevousX = event.clientX;
+      move = true;
+      event.preventDefault();
+    });
+
+    element.on('mouseup', function(event) {
+      move = false;
+    });
+
+    element.on('mouseout', function(event) {
+      move = false;
+    });
+
+    element.on('mousemove', function(event) {
+      if (!move) return false;
+      element[0].scrollLeft -= event.clientX - prevousX;
+      prevousX = event.clientX;
+    });
+
+    element.on('mousedown', function(event) {
+      event.preventDefault();
+    });
+
+  }
+
+}]);
+
 var controllers = angular.module('memoroControllers', []);
 
 controllers.controller('UsersController', ['$scope', 'User', function ($scope, User) {
@@ -31,33 +68,6 @@ controllers.controller('UsersController', ['$scope', 'User', function ($scope, U
 }]);
 
 controllers.controller('UserController', ['$scope', 'User', 'Board', 'Note', function ($scope, User, Board, Note) {
-
-  var move = false;
-  var prevousX = 0;
-
-  $scope.boardsMouseDown = function($event) {
-    prevousX = $event.clientX;
-    move = true;
-    $event.preventDefault();
-  }
-
-  $scope.boardsMouseUp = function($event) {
-    move = false;
-  }
-
-  $scope.boardsMouseOut = function($event) {
-    move = false;
-  }
-
-  $scope.boardsMouseMove = function($event) {
-    if (!move) return false;
-    document.querySelector("#boards").scrollLeft -= $event.clientX - prevousX;
-    prevousX = $event.clientX;
-  }
-
-  $scope.boardMouseDown = function($event) {
-    $event.preventDefault();
-  }
 
   function makeEditable(element) {
     element.classList.remove("empty");

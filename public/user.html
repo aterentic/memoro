@@ -5,7 +5,7 @@
         <link href="/css/memoro.css" rel="stylesheet" type="text/css" />
     </head>
     <body ng-controller="UserController">
-        <ul id="boards" ng-mouseout="boardsMouseOut($event)" ng-mousedown="boardsMouseDown($event)" ng-mouseup="boardsMouseUp($event)" ng-mousemove="boardsMouseMove($event)">
+        <ul id="boards" memoro-draggable>
             <li class="board{{board.selected}}" ng-mousedown="boardMouseDown($event)" ng-click="boardClick($event)" ng-repeat="board in user.boards | orderBy:orderBy" data-name="{{board.name}}">
                 {{board.name}}
             </li>

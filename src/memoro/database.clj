@@ -39,6 +39,11 @@
 (defn delete-db []
   (d/delete-database uri))
 
+(defn exists? [{:keys [code]}]
+  (if (= code nil)
+    nil
+    (= 1 (count (d/q '[:find ?user-id :in $ ?code :where [?user-id :user/code ?code]] (read-db) code)))))
+
 (defn add-user [{:keys [code]}]
   (d/transact (connect) [{:db/id (d/tempid :db.part/user) :user/code code}]))
 

@@ -1,5 +1,6 @@
 (ns memoro.routes
   (:use [compojure.core]
+        [ring.middleware params nested-params keyword-params]
         [ring.middleware.json :only [wrap-json-response]]
         [ring.util.response :only [response]])
   (:require [memoro.users :as users]
@@ -7,6 +8,12 @@
             [clojure.data.json :as json]
             [compojure.handler :as handler]
             [compojure.route :as route]))
+
+;; TODO unauthorized-user returns invalid WWW-Authenticate header value.
+(defn unauthorized-user []
+  {:status 401
+   :headers {"Content-Type" "text/html; charset=UTF8", "WWW-Authenticate" "Query realm=\"MemoroUser\""}
+   :body "User code is not provided in URL or user does not exist"})
 
 (defn see-other [location]
   {:status 303
@@ -28,6 +35,18 @@
   (let [user (memoro.users/create-user)]
     (db/add-user user)
     user))
+
+(defn authenticated? [user]
+  (db/exists? user))
+
+(defn wrap-authenication [handler]
+  (fn [request]
+    (if (authenticated? (:params request))
+      (handler request)
+      (unauthorized-user))))
+
+(defmacro defauthroutes [name {:keys [context auth-handler]} & handlers]
+  `(def ~name (context ~context [] (~auth-handler (routes ~@handlers)))))
 
 (defroutes json-routes
   (GET "/user" []
@@ -56,14 +75,22 @@
              (db/add-note-item (:id note) (:text note))
          (see-other (note-api-location note)))))
 
+(defauthroutes user-routes
+  {:context "/user" :auth-handler wrap-authenication}
+  (GET "/" {user :params}
+       (response (db/get-user user))))
+
 (defroutes app-routes
   (route/files "/" {:root "public"})
   (route/resources "/")
   (route/not-found "Not Found"))
 
 (def app
-  (routes
-   (-> (context "/api" [] json-routes)
-       (handler/api)
-       (wrap-json-response))
-   (handler/site app-routes)))
+  (-> (routes
+       user-routes
+       (context "/api" [] json-routes)
+       app-routes)
+      (wrap-keyword-params)
+      (wrap-nested-params)
+      (wrap-params)
+      (wrap-json-response {:escape-non-ascii true})))

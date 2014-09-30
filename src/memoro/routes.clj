@@ -1,5 +1,6 @@
 (ns memoro.routes
-  (:use [compojure.core]
+  (:use [clojure.stacktrace]
+        [compojure.core]
         [ring.middleware params nested-params keyword-params]
         [ring.middleware.json :only [wrap-json-response]]
         [ring.util.response :only [response]])
@@ -48,32 +49,33 @@
 (defmacro defauthroutes [name {:keys [context auth-handler]} & handlers]
   `(def ~name (context ~context [] (~auth-handler (routes ~@handlers)))))
 
-(defroutes json-routes
-  (GET "/user" []
-       (response (db/get-users)))
-  (GET "/user/:code" [code]
-       (response (db/get-user {:code code})))
-  (GET "/user/:user/board/:name" [user name]
-       (response (db/get-board {:user user :name name})))
-  (GET "/user/:user/board/:name/note/:id" [user name id]
-       (response (db/get-note (bigint id))))
-  (POST "/user" []
-        (-> (create-user)
-            (user-location)
-            (see-other)))
-  (POST "/user/:user/board" {params :body}
-        (let [board (json/read-str (slurp params) :key-fn keyword)]
-          (db/add-board board)
-          (see-other (board-api-location board))))
-  (POST "/user/:user/board/:name/note" {params :body}
-        (let [data (json/read-str (slurp params) :key-fn keyword)
-              note (merge {:id (db/add-note data)} data)]
-          (see-other (note-api-location note))))
-  (POST "/user/:user/board/:name/note/:id" {params :body}
-       (let [note (json/read-str (slurp params) :key-fn keyword)]
-         (println note)
-             (db/add-note-item (:id note) (:text note))
-         (see-other (note-api-location note)))))
+(def json-routes
+  (context "/api" []
+           (routes json-routes
+                   (GET "/user" []
+                        (response (db/get-users)))
+                   (GET "/user/:code" [code]
+                        (response (db/get-user {:code code})))
+                   (GET "/user/:user/board/:name" [user name]
+                        (response (db/get-board {:user user :name name})))
+                   (GET "/user/:user/board/:name/note/:id" [user name id]
+                        (response (db/get-note (bigint id))))
+                   (POST "/user" []
+                         (-> (create-user)
+                             (user-location)
+                             (see-other)))
+                   (POST "/user/:user/board" {params :body}
+                         (let [board (json/read-str (slurp params) :key-fn keyword)]
+                           (db/add-board board)
+                           (see-other (board-api-location board))))
+                   (POST "/user/:user/board/:name/note" {params :body}
+                         (let [data (json/read-str (slurp params) :key-fn keyword)
+                               note (merge {:id (db/add-note data)} data)]
+                           (see-other (note-api-location note))))
+                   (POST "/user/:user/board/:name/note/:id" {params :body}
+                         (let [note (json/read-str (slurp params) :key-fn keyword)]
+                           (db/add-note-item (:id note) (:text note))
+                           (see-other (note-api-location note)))))))
 
 (defauthroutes user-routes
   {:context "/user" :auth-handler wrap-authenication}
@@ -85,12 +87,19 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(defn wrap-logging [handler]
+  (fn [request]
+    (try
+      (println "=>" request)
+      (let [response (handler request)]
+        (println "<=" response)
+        response)
+      (catch Throwable e (print-cause-trace e)))))
+
 (def app
-  (-> (routes
-       user-routes
-       (context "/api" [] json-routes)
-       app-routes)
+  (-> (routes user-routes json-routes app-routes)
       (wrap-keyword-params)
       (wrap-nested-params)
       (wrap-params)
-      (wrap-json-response {:escape-non-ascii true})))
+      (wrap-json-response {:escape-non-ascii true})
+      (wrap-logging)))

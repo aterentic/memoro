@@ -1,10 +1,13 @@
 (ns memoro.routes
-  (:use [clojure.stacktrace]
-        [compojure.core]
-        [ring.middleware params nested-params keyword-params]
-        [ring.middleware.json :only [wrap-json-response]]
-        [ring.util.response :only [response]])
-  (:require [memoro.users :as users]
+  (:require [clojure.stacktrace :refer [print-cause-trace]]
+            [compojure.core :refer [context routes GET POST defroutes]]
+            [ring.middleware
+             [params :refer [wrap-params ]]
+             [nested-params :refer [wrap-nested-params]]
+             [keyword-params :refer [wrap-keyword-params]]
+             [json :refer [wrap-json-response]]]
+            [ring.util.response :refer [response]]
+            [memoro.users :as users]
             [memoro.database :as db]
             [clojure.data.json :as json]
             [compojure.handler :as handler]

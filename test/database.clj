@@ -1,5 +1,5 @@
 (ns memoro.database
-  (:use midje.sweet))
+  (:require [midje.sweet :refer :all]))
 
 (facts "about 'strip-namespace'"
        (fact "keyword without namespace is returned (part of keyword after '/')."

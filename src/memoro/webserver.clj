@@ -1,7 +1,8 @@
 (ns memoro.webserver
-  (:use [compojure.core]
-        [ring.adapter.jetty]
-        [memoro.routes :as routes]))
+  (:require
+   [ring.adapter.jetty :refer :all]
+   [compojure.core :refer :all]
+   [memoro.routes :as routes]))
 
 (defonce server
     (run-jetty (var routes/app) {:port 8080 :join? false}))

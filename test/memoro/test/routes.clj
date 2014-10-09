@@ -1,7 +1,7 @@
 (ns memoro.test.routes
-  (:use clojure.test
-        ring.mock.request
-        memoro.routes))
+  (:require [clojure.test :refer :all]
+        [ring.mock.request :refer :all]
+        [memoro.routes :refer :all]))
 
 (deftest test-app
   (testing "not-found route"

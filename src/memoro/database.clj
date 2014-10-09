@@ -1,8 +1,8 @@
 (ns memoro.database
-  (:use
-   [clojure.string :as string :only (split)]
+  (:require
+   [clojure.string :as string :refer [split]]
    [clojure.walk :as walk]
-   [datomic.api :only (q db) :as d]))
+   [datomic.api :as d :refer [q db]]))
 
 (def uri "datomic:mem://memoro")
 

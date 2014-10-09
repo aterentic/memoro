@@ -1,15 +1,15 @@
 (ns memoro.instarepl
-  (:use
+  (:require
    [memoro.webserver :as ws]
    [memoro.database :as db]
    [memoro.users :as users]))
 
-(ws/stop)
-(ws/start)
+(memoro.webserver/stop)
+(memoro.webserver/start)
 
-(db/delete-db)
-(db/make-db)
-(db/get-users)
-(let [user (users/create-user)]
-  (db/add-user user)
-  (db/add-board {:user (:code user) :name "Default"}))
+(memoro.database/delete-db)
+(memoro.database/make-db)
+(memoro.database/get-users)
+(let [user (memoro.users/create-user)]
+  (memoro.database/add-user user)
+  (memoro.database/add-board {:user (:code user) :name "Default"}))

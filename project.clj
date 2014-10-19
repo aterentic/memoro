@@ -1,6 +1,6 @@
 (defproject memoro "0.1.0-SNAPSHOT"
-  :description "FIXME: write memoro description"
-  :url "http://example.com/FIXME"
+  :description "Memoro, yet another TODO."
+  :url "http://memoro.herokuapp.com"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/data.json "0.2.4"]

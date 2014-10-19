@@ -11,7 +11,7 @@ var memoro = (function () {
   return {
     id : function() {
       return 'xxxxxxxxxx'.replace(/./g, function(c) {
-        return (Math.random() * 16 | 0).toString(16);
+        return Math.floor(Math.random() * 16).toString(16);
       });
     },
     user : function(id) {

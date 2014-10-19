@@ -7,6 +7,7 @@
                  [compojure "1.1.6"]
                  [ring/ring-json "0.3.1"]
                  [ring/ring-jetty-adapter "1.2.2"]
+                 [liberator "0.12.2"]
                  [com.datomic/datomic-free "0.9.4699"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler memoro.routes/app}

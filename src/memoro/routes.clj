@@ -1,6 +1,6 @@
 (ns memoro.routes
   (:require [clojure.stacktrace :refer [print-cause-trace]]
-            [compojure.core :refer [context routes GET POST defroutes]]
+            [compojure.core :refer [context routes ANY GET POST defroutes]]
             [ring.middleware
              [params :refer [wrap-params ]]
              [nested-params :refer [wrap-nested-params]]
@@ -11,7 +11,8 @@
             [memoro.database :as db]
             [clojure.data.json :as json]
             [compojure.handler :as handler]
-            [compojure.route :as route]))
+            [compojure.route :as route]
+            [liberator.core :refer [resource]]))
 
 ;; TODO unauthorized-user returns invalid WWW-Authenticate header value.
 (defn unauthorized-user []
@@ -90,6 +91,11 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(defroutes resource-routes
+  (ANY "/memoro" []
+       (resource :available-media-types ["application/json"]
+                 :handle-ok (fn [_] (json/write-str {:_links {:users "/users"}}  :escape-slash false)))))
+
 (defn wrap-logging [handler]
   (fn [request]
     (try
@@ -100,7 +106,7 @@
       (catch Throwable e (print-cause-trace e)))))
 
 (def app
-  (-> (routes user-routes json-routes app-routes)
+  (-> (routes user-routes json-routes resource-routes app-routes)
       (wrap-keyword-params)
       (wrap-nested-params)
       (wrap-params)

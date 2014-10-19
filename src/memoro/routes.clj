@@ -93,10 +93,15 @@
 
 (defresource memoro
   :available-media-types ["application/json"]
-  :handle-ok (fn [_] (json/write-str {:_links {:users "/users"}}  :escape-slash false)))
+  :handle-ok (fn [_] (json/write-str {:_links {:users "/users"}} :escape-slash false)))
+
+(defresource users
+  :available-media-types ["application/json"]
+  :handle-ok (fn [_] (json/write-str {:_links {:self "/users"}} :escape-slash false)))
 
 (defroutes resource-routes
-  (ANY "/memoro" [] memoro))
+  (ANY "/memoro" [] memoro)
+  (ANY "/memoro/users" [] users   ))
 
 (defn wrap-logging [handler]
   (fn [request]

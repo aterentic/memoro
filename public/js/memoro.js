@@ -28,5 +28,7 @@ app.factory('Memoro', ['$resource', function($resource) {
 }]);
 
 app.controller('MemoroController', ['$scope', 'Memoro', function($scope, Memoro) {
-  console.log(Memoro.get());
+  Memoro.get({}, function(memoro) {
+    console.log(memoro);
+  });
 }]);

@@ -12,7 +12,7 @@
             [clojure.data.json :as json]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [liberator.core :refer [resource]]))
+            [liberator.core :refer [defresource]]))
 
 ;; TODO unauthorized-user returns invalid WWW-Authenticate header value.
 (defn unauthorized-user []
@@ -91,10 +91,12 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(defresource memoro
+  :available-media-types ["application/json"]
+  :handle-ok (fn [_] (json/write-str {:_links {:users "/users"}}  :escape-slash false)))
+
 (defroutes resource-routes
-  (ANY "/memoro" []
-       (resource :available-media-types ["application/json"]
-                 :handle-ok (fn [_] (json/write-str {:_links {:users "/users"}}  :escape-slash false)))))
+  (ANY "/memoro" [] memoro))
 
 (defn wrap-logging [handler]
   (fn [request]

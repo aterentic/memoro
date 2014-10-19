@@ -1,4 +1,4 @@
-var memoro = (function () {
+(function () {
 
   function store(key, val) {
     localStorage.setItem(key, val);
@@ -20,3 +20,13 @@ var memoro = (function () {
   }
 
 })();
+
+var app = angular.module('memoro', ['ngResource']);
+
+app.factory('Memoro', ['$resource', function($resource) {
+  return $resource('memoro');
+}]);
+
+app.controller('MemoroController', ['$scope', 'Memoro', function($scope, Memoro) {
+  console.log(Memoro.get());
+}]);

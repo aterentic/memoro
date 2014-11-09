@@ -1,6 +1,5 @@
 (ns memoro.instarepl
   (:require
-   [memoro.webserver :as ws]
    [memoro.database :as db]
    [memoro.users :as users]))
 

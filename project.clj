@@ -4,15 +4,19 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/data.json "0.2.4"]
+                 [environ "1.0.0"]
                  [compojure "1.1.6"]
                  [ring/ring-json "0.3.1"]
                  [liberator "0.12.2"]
                  [com.datomic/datomic-free "0.9.4699"]]
-  :plugins [[lein-ring "0.8.10"]]
-  :ring { :handler memoro.routes/app :port 8080 }
-  :profiles {:dev { :dependencies [[org.clojure/tools.nrepl "0.2.5"]
+  :plugins [[lein-ring "0.8.10"]
+            [lein-environ "1.0.0"]]
+  :ring { :handler memoro.routes/app }
+  :profiles {:dev { :env { :nrepl? true :nrepl-port 8081 :nrepl-middleware lighttable.nrepl.handler/lighttable-ops }
+                    :dependencies [[org.clojure/tools.nrepl "0.2.5"]
                                    [lein-light-nrepl "0.0.19"][javax.servlet/servlet-api "2.5"]
                                    [ring-mock "0.1.5"]
                                    [midje "1.6.3"]]
                     :plugins [[lein-midje "3.1.3"]]
-                    :ring { :init memoro.nrepl/start }}})
+                    :ring { :init memoro.nrepl/start
+                            :port 8080 }}})

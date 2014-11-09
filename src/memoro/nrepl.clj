@@ -1,6 +1,23 @@
 (ns memoro.nrepl
-  (:require [clojure.tools.nrepl.server :refer [start-server default-handler]]
-            [lighttable.nrepl.handler :refer [lighttable-ops]]))
+  (:require [environ.core :refer [env]]
+            [clojure.tools.nrepl.server :refer [start-server default-handler]]))
+
+(defonce defaults
+  (load-file "resources/defaults.clj"))
+
+(defonce nrepl?
+  (or (env :nrepl?) (defaults :nrepl?)))
+
+(defn- handler [middleware]
+  (if middleware
+    (do
+      (require [(read-string (namespace middleware))])
+      (default-handler (resolve middleware)))
+    default-handler))
 
 (defn start []
-  (defonce nrepl-server (start-server :port 8081 :handler (default-handler (var lighttable-ops)))))
+  (if nrepl?
+    (defonce nrepl-server
+      (let [nrepl-port (or (env :nrepl-port) (defaults :nrepl-port))
+            nrepl-middleware (or (env :nrepl-middleware) (defaults :nrepl-middleware))]
+        (start-server :port nrepl-port :handler (handler nrepl-middleware))))))

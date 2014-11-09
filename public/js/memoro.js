@@ -21,14 +21,32 @@
 
 })();
 
-var app = angular.module('memoro', ['ngResource']);
+var memoro = angular.module('memoro', ['ngRoute', 'ngResource']);
 
-app.factory('Memoro', ['$resource', function($resource) {
+memoro.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+  $routeProvider.
+  when('/start', {
+    templateUrl: 'start.html',
+    controller: 'StartController'
+  }).
+  otherwise({
+    redirectTo: '/start'
+  });
+  $locationProvider.html5Mode({"enabled" : false, "requireBase" : false});
+}]);
+
+
+memoro.factory('Memoro', ['$resource', function($resource) {
   return $resource('memoro');
 }]);
 
-app.controller('MemoroController', ['$scope', 'Memoro', function($scope, Memoro) {
+memoro.controller('MemoroController', ['$scope', 'Memoro', function($scope, Memoro) {
   Memoro.get({}, function(memoro) {
     console.log(memoro);
   });
 }]);
+
+memoro.controller('StartController', function($scope) {
+  console.log("Welcome to Memoro.");
+});
+

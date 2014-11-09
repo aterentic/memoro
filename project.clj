@@ -6,13 +6,13 @@
                  [org.clojure/data.json "0.2.4"]
                  [compojure "1.1.6"]
                  [ring/ring-json "0.3.1"]
-                 [ring/ring-jetty-adapter "1.2.2"]
                  [liberator "0.12.2"]
                  [com.datomic/datomic-free "0.9.4699"]]
   :plugins [[lein-ring "0.8.10"]]
-  :ring {:handler memoro.routes/app}
-  :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring-mock "0.1.5"]
-                        [midje "1.6.3"]]
-         :plugins [[lein-midje "3.1.3"]]}})
+  :ring { :handler memoro.routes/app :port 8080 }
+  :profiles {:dev { :dependencies [[org.clojure/tools.nrepl "0.2.5"]
+                                   [lein-light-nrepl "0.0.19"][javax.servlet/servlet-api "2.5"]
+                                   [ring-mock "0.1.5"]
+                                   [midje "1.6.3"]]
+                    :plugins [[lein-midje "3.1.3"]]
+                    :ring { :init memoro.nrepl/start }}})

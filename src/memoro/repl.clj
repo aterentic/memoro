@@ -4,9 +4,6 @@
    [memoro.database :as db]
    [memoro.users :as users]))
 
-(memoro.webserver/stop)
-(memoro.webserver/start)
-
 (memoro.database/delete-db)
 (memoro.database/make-db)
 (memoro.database/get-users)

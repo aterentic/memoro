@@ -99,9 +99,23 @@
   :available-media-types ["application/json"]
   :handle-ok (fn [_] (json/write-str {:_links {:self "/users"}} :escape-slash false)))
 
+(defresource notes
+  :allowed-methods [:get :post]
+  :available-media-types ["application/json"]
+  :handle-ok (fn [_] (json/write-str {:_links {:self "/notes"}} :escape-slash false))
+  :post! (fn [ctx] {::id "TODO"})
+  :post-redirect? (fn [ctx] {:location (format "/memoro/notes/%s" (::id ctx))}))
+
+(defresource note [id]
+  :allowed-methods [:get]
+  :available-media-types ["application/json"]
+  :handle-ok (fn [_] (json/write-str {:_links {:self (format "/memoro/notes/%s" id)}} :escape-slash false)))
+
 (defroutes resource-routes
   (ANY "/memoro" [] memoro)
-  (ANY "/memoro/users" [] users   ))
+  (ANY "/memoro/users" [] users)
+  (ANY "/memoro/notes" [] notes)
+  (ANY "/memoro/notes/:id" [id] note id))
 
 (defn wrap-logging [handler]
   (fn [request]

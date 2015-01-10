@@ -81,6 +81,12 @@
                            (db/add-note-item (:id note) (:text note))
                            (see-other (note-api-location note)))))))
 
+(defn- read-json [ctx]
+  (dosync (-> ctx
+              (get-in [:request :body])
+              slurp
+              (json/read-str :key-fn keyword))))
+
 (defauthroutes user-routes
   {:context "/user" :auth-handler wrap-authenication}
   (GET "/" {user :params}
@@ -103,7 +109,7 @@
   :allowed-methods [:get :post]
   :available-media-types ["application/json"]
   :handle-ok (fn [_] (json/write-str {:_links {:self "/notes"}} :escape-slash false))
-  :post! (fn [ctx] {::id "TODO"})
+  :post! (fn [ctx] (let [note (read-json ctx) ] {::id (:id note)}))
   :post-redirect? (fn [ctx] {:location (format "/memoro/notes/%s" (::id ctx))}))
 
 (defresource note [id]
@@ -115,7 +121,7 @@
   (ANY "/memoro" [] memoro)
   (ANY "/memoro/users" [] users)
   (ANY "/memoro/notes" [] notes)
-  (ANY "/memoro/notes/:id" [id] note id))
+  (ANY "/memoro/notes/:id" [id] (note id)))
 
 (defn wrap-logging [handler]
   (fn [request]

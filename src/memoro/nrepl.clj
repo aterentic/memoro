@@ -8,16 +8,16 @@
 (defonce nrepl?
   (or (env :nrepl?) (defaults :nrepl?)))
 
-(defn- handler [middleware]
-  (if middleware
+(defn- resolve-handler [handler]
+  (if handler
     (do
-      (require [(read-string (namespace middleware))])
-      (default-handler (resolve middleware)))
-    default-handler))
+      (require [(read-string (namespace handler))])
+      (resolve handler))
+    (default-handler)))
 
 (defn start []
   (if nrepl?
     (defonce nrepl-server
       (let [nrepl-port (or (env :nrepl-port) (defaults :nrepl-port))
-            nrepl-middleware (or (env :nrepl-middleware) (defaults :nrepl-middleware))]
-        (start-server :port nrepl-port :handler (handler nrepl-middleware))))))
+            nrepl-handler (or (env :nrepl-handler) (defaults :nrepl-handler))]
+        (start-server :port nrepl-port :handler (resolve-handler nrepl-handler))))))

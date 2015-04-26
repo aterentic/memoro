@@ -12,9 +12,12 @@
   :plugins [[lein-ring "0.8.10"]
             [lein-environ "1.0.0"]]
   :ring { :handler memoro.routes/app }
-  :profiles {:dev { :env { :nrepl? true :nrepl-port 8081 :nrepl-middleware lighttable.nrepl.handler/lighttable-ops }
-                    :dependencies [[org.clojure/tools.nrepl "0.2.5"]
-                                   [lein-light-nrepl "0.0.19"][javax.servlet/servlet-api "2.5"]
+  :profiles {:dev 
+             { :env 
+              { :nrepl? true :nrepl-port 8081 :nrepl-handler cider.nrepl/cider-nrepl-handler }
+              :dependencies [[org.clojure/tools.nrepl "0.2.10"]
+                                   [cider/cider-nrepl "0.8.2"]
+                                   [javax.servlet/servlet-api "2.5"]
                                    [ring-mock "0.1.5"]
                                    [midje "1.6.3"]]
                     :plugins [[lein-midje "3.1.3"]]

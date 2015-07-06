@@ -2,76 +2,62 @@
   (:require
    [clojure.string :as string :refer [split]]
    [clojure.walk :as walk]
-   [datomic.api :as d :refer [q db]]))
+   [datomic.api :as datomic :refer [q db]]))
 
 (def uri "datomic:mem://memoro")
 
+(def schema-data [{:db/ident :note/identificator
+                   :db/valueType :db.type/uuid
+                   :db/cardinality :db.cardinality/one
+                   :db/doc "Note identificator." }
+                  {:db/ident :note/name
+                   :db/valueType :db.type/string
+                   :db/cardinality :db.cardinality/one
+                   :db/doc "Note name."}
+                  {:db/ident :note/items
+                   :db/valueType :db.type/ref
+                   :db/cardinality :db.cardinality/many
+                   :db/isComponent true
+                   :db/doc "Note items." }
+                  {:db/ident :item/priority
+                   :db/valueType :db.type/long
+                   :db/cardinality :db.cardinality/one
+                   :db/doc "Item priority."}
+                  {:db/ident :item/checked?
+                   :db/valueType :db.type/boolean
+                   :db/cardinality :db.cardinality/one
+                   :db/doc "Item checked?"}
+                  {:db/ident :item/text
+                   :db/valueType :db.type/string
+                   :db/cardinality :db.cardinality/one
+                   :db/doc "Item text."}])
+
+(defn schema []
+  (map (fn [attr] 
+         (merge attr {:db/id (datomic/tempid :db.part/db) :db.install/_attribute :db.part/db})) 
+       schema-data))
+
 (defn- connect []
-  (d/connect uri))
+  (datomic/connect uri))
 
 (defn- read-db []
-  (d/db (connect)))
+  (datomic/db (connect)))
 
-(defn- create-schema []
-  (d/transact (connect) (load-file "resources/schema.clj")))
+(defn init-db []
+  (datomic/create-database uri)
+  (datomic/transact (connect) (schema)))
 
-(defn- strip-namespace [kwd]
-  (keyword (second (string/split (str kwd) #"/"))))
+(defn persist-entity [entity]
+  (let [temp-id (datomic/tempid :db.part/user)
+        tx (datomic/transact (connect) [(merge {:db/id temp-id} entity)])]
+    (datomic/resolve-tempid (read-db) (:tempids @tx) temp-id)))
 
-(defn- strip-namespaces [entity]
-  (walk/postwalk
-   (fn [value] (if (keyword? value) (strip-namespace value) value))
-   entity))
+(defn find-entity [[key identificator]]
+  (first (first (datomic/q [:find '?id :in '$ '?identificator :where ['?id key '?identificator]] (read-db) identificator))))
 
-(defn- read-entity [eid]
-  (read-string (pr-str (d/touch (d/entity (read-db) eid)))))
+(defn read-entity [id]
+  (datomic/entity (read-db) id))
 
-(defn- user-id [{:keys [code]}]
-  (first (first (d/q '[:find ?user_id :in $ ?code :where [?user_id :user/code ?code]] (read-db) code))))
+(defn find-entities [id-key]
+  (map first (datomic/q [:find '?id :in '$ :where ['?id id-key '_]] (read-db))))
 
-(defn- board-id [{:keys [user name]}]
-  (first (first (d/q '[:find ?board_id :in $ ?user ?name :where [?u :user/code ?user] [?u :user/boards ?board_id] [?board_id :board/name ?name]] (read-db) user name))))
-
-(defn make-db []
-  (d/create-database uri)
-  (create-schema))
-
-(defn delete-db []
-  (d/delete-database uri))
-
-(defn exists? [{:keys [code]}]
-  (if (= code nil)
-    nil
-    (= 1 (count (d/q '[:find ?user-id :in $ ?code :where [?user-id :user/code ?code]] (read-db) code)))))
-
-(defn add-user [{:keys [code]}]
-  (d/transact (connect) [{:db/id (d/tempid :db.part/user) :user/code code}]))
-
-(defn get-user [user]
-  (strip-namespaces (read-entity (user-id user))))
-
-(defn get-users []
-  (map
-   (fn [code] {:code (first code)})
-   (q '[:find ?n :where [?c user/code ?n ]] (read-db))))
-
-(defn get-board [board]
-  (strip-namespaces (read-entity (board-id board))))
-
-(defn get-note [id]
-  (strip-namespaces (read-entity id)))
-
-(defn add-board [{:keys [user name]}]
-  (let [temp-id (d/tempid :db.part/user)
-        user-id (user-id {:code user})]
-    (d/transact (connect) [{:db/id temp-id :board/name name}
-                           {:db/id user-id :user/boards temp-id}])))
-
-(defn add-note [{:keys [user board text]}]
-  (let [note-id (d/tempid :db.part/user)
-        board-id (board-id {:user user :name board})]
-    (d/resolve-tempid (read-db) (:tempids @(d/transact (connect) [{:db/id note-id :note/text text}
-                                                                  {:db/id board-id :board/notes note-id}])) note-id)))
-(defn add-note-item [note-id text]
-  (let [note (d/entity (read-db) note-id)]
-    (d/transact (connect) [{:db/id note-id :note/text text}])))

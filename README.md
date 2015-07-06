@@ -1,10 +1,6 @@
 # memoro
 
-Two brains are smarter than one!
-
-Another notes.
-
-Angular.js front end, Clojure and Datomic backend.
+Fast note!
 
 ## Prerequisites
 
@@ -16,8 +12,6 @@ You will need [Leiningen][1] 1.7.0 or above installed.
 
 To start a web server for the application, run:
 
-    lein ring server
+    lein ring server-headless
 
-## License
-
-Copyright © 2014 Untitled
+Remote REPL server will be launched by default on 8081 port.

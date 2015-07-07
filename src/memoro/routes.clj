@@ -35,6 +35,7 @@
 (defresource items [note]
   :allowed-methods [:get :post]
   :exists? (fn [ctx] (if-let [id (notes/find-note note)] {::id id}))
+  :post (fn [ctx] (notes/add-item (read-json ctx)))
   :available-media-types ["application/json"]
   :handle-ok (fn [_] (json/write-str (notes/get-items note) :escape-slash false)))
   

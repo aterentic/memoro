@@ -54,8 +54,10 @@
 
 (defn persist-child [{:keys [id collection]} child-attributes]
   (let [temp-id (datomic/tempid :db.part/user)
-        attrs (map (fn [e] (assoc e :db/id temp-id)))]
-    (datomic/transact (connect) [merge {:db/id id collection temp-id} attrs])))
+        attrs (vec (map (fn [e] (vec (reduce merge [:db/add temp-id] e)) child-attributes)))
+        tx (datomic/transact (connect) attrs)
+        item-id (datomic/resolve-tempid (read-db) (:tempids @tx) temp-id)]
+    (datomic/transact (connect) [:db/add id collection item-id])))
 
 (defn find-entity [[key identificator]]
   (first (first (datomic/q [:find '?id :in '$ '?identificator :where ['?id key '?identificator]] (read-db) identificator))))

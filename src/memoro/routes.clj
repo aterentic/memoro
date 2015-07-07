@@ -32,9 +32,16 @@
   :available-media-types ["application/json"]
   :handle-ok (fn [_] (json/write-str (notes/get-note identificator) :escape-slash false)))
 
+(defresource items [note]
+  :allowed-methods [:get :post]
+  :exists? (fn [ctx] (if-let [id (notes/find-note note)] {::id id}))
+  :available-media-types ["application/json"]
+  :handle-ok (fn [_] (json/write-str (notes/get-items note) :escape-slash false)))
+  
 (defroutes resource-routes
   (ANY "/notes" [] notes)
-  (ANY "/notes/:identificator" [identificator] (note identificator)))
+  (ANY "/notes/:identificator" [identificator] (note identificator))
+  (ANY "/notes/:note/items" [note] (items note)))
 
 (def app
   (->  resource-routes

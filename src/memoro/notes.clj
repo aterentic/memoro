@@ -3,6 +3,8 @@
 
 (def note-keys [:db/id :note/identificator :note/name :note/items])
 
+(def item-keys [:db/id :item/priority :item/checked? :item/text])
+
 (defn- uuid [] (java.util.UUID/randomUUID))
 
 (defn- uuid-from-string [data]
@@ -24,6 +26,14 @@
 
 (defn get-note [identificator]
   (map-keys (db/read-entity (find-note identificator)) note-keys))
+
+(defn get-items [note]
+  (map (fn [item] (map-keys item)) (:note/items (db/read-entity (find-note note))) item-keys))
+
+(defn add-item [{:keys [note priority checked? text]}]
+  (db/persist-child [note [{:item/priority priority}
+                           {:item/checked? checked}
+                           {:item/text text}]]))
 
 (defn update-note [id {:keys [name items]}] 
 ;TODO let id = :id (map rest items ... ) #({:db/id (:id items) :item/

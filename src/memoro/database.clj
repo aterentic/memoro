@@ -52,14 +52,10 @@
         tx (datomic/transact (connect) [(merge {:db/id temp-id} entity)])]
     (datomic/resolve-tempid (read-db) (:tempids @tx) temp-id)))
 
-(defn persist-child [parent child-attributes]
-  (let [temp-id (datomic/tempid :db.part/user)]
-    (d/transact (connect) [{:db/id parent :note/items temp-id}
-                           (map (fn [e] (assoc e :db/id temp-id)) 
-                           
-                           {:db/id temp-id :item/priority priority}
-                           {:db/id temp-id :item/checked? checked}
-                           {:db/id temp-id :item/text text}])))
+(defn persist-child [{:keys [id collection]} child-attributes]
+  (let [temp-id (datomic/tempid :db.part/user)
+        attrs (map (fn [e] (assoc e :db/id temp-id)))]
+    (datomic/transact (connect) [merge {:db/id id collection temp-id} attrs])))
 
 (defn find-entity [[key identificator]]
   (first (first (datomic/q [:find '?id :in '$ '?identificator :where ['?id key '?identificator]] (read-db) identificator))))

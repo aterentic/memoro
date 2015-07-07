@@ -32,7 +32,7 @@
 
 (defn add-item [{:keys [note priority checked? text]}]
   (db/persist-child [note [{:item/priority priority}
-                           {:item/checked? checked}
+                           {:item/checked? checked?}
                            {:item/text text}]]))
 
 (defn update-note [id {:keys [name items]}] 

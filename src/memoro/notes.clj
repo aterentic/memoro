@@ -1,7 +1,7 @@
 (ns memoro.notes
   (:require [memoro.database :as db]))
 
-(def note-keys [:db/id :note/identificator :note/name :note/items])
+(def note-keys [:db/id :note/identificator :note/name])
 
 (def item-keys [:db/id :item/priority :item/checked? :item/text])
 
@@ -28,15 +28,14 @@
   (map-keys (db/read-entity (find-note identificator)) note-keys))
 
 (defn get-items [note]
-  (map (fn [item] (map-keys item)) (:note/items (db/read-entity (find-note note))) item-keys))
+  (map (fn [item] (map-keys item item-keys)) (:note/items (db/read-entity (find-note note)))))
 
 (defn add-item [{:keys [note priority checked? text]}]
-  (db/persist-child {:id note :collection :note/items}
-                    {:item/priority priority
-                     :item/checked? checked?
-                     :item/text text}))
+  (do (println {:note note :text text})
+      (db/persist-child {:id note :collection :note/items}
+                        {:item/priority priority
+                         :item/checked? checked?
+                         :item/text text})))
 
-(defn update-note [id {:keys [name items]}] 
-;TODO let id = :id (map rest items ... ) #({:db/id (:id items) :item/
-;TODO db/update-entity {:id id :items [{:item/id x :item/text x :item/order x :item/... x}]))
-)
+(defn get-item [id]
+  (map-keys (db/read-entity id) item-keys))

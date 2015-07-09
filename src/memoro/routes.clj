@@ -5,7 +5,8 @@
              [nested-params :refer [wrap-nested-params]]
              [keyword-params :refer [wrap-keyword-params]]
              [json :refer [wrap-json-response]]]
-            [clojure.data.json :as json]
+            [clojure.data.json :as json]            
+            [compojure.route :as route]
             [liberator.core :refer [defresource]]
             [memoro.notes :as notes]))
 
@@ -41,14 +42,15 @@
   :available-media-types ["application/json"]
   :handle-ok (fn [_] (json/write-str (notes/get-item id))))
 
-(defroutes resource-routes
+(defroutes app-routes
   (ANY "/notes" [] notes)
   (ANY "/notes/:identificator" [identificator] (note identificator))
   (ANY "/notes/:note/items" [note] (items note))
-  (ANY "/notes/:note/items/:id" [_ id]))
+  (ANY "/notes/:note/items/:id" [_ id])
+  (route/files "/" {:root "public"}))
 
 (def app
-  (->  resource-routes
+  (->  app-routes
        (wrap-keyword-params)
        (wrap-nested-params)
        (wrap-params)

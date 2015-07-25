@@ -1,13 +1,7 @@
-var data = [
-    {text: "First", order: 1},
-    {text: "Second", order: 2}
-];
-
-
 var NoteItem  = React.createClass({
     render: function() {
 	return (
-		<li className="note-item">
+	    <li className="note-item">
 		{this.props.text}
 	    </li>
 	);
@@ -15,14 +9,25 @@ var NoteItem  = React.createClass({
 });
 
 var Note = React.createClass({
+    getInitialState: function() {
+	return {data: {items: []}};
+    },
+    componentDidMount: function () {
+	var url = "notes/" + location.queryParams["note"] + "/items";
+	$.get(url).done(function(data) {
+	    console.log(data);
+	    this.setState({data: {items: data}});
+	}.bind(this));
+    },
     render: function() {
-	var items = this.props.data.map(function(item) {
+	var items = this.state.data.items.map(function(item) {
+	    console.log(item);
 	    return (
 		    <NoteItem text={item.text} />
 	    );
 	});
 	return (
-		<ul className="note">
+	    <ul className="note">
 		{items}
 	    </ul>
 	);
@@ -30,7 +35,7 @@ var Note = React.createClass({
 });
 
 React.render(
-	<Note data={data}/>,
+    <Note/>,
     document.getElementById('content')
 );
 

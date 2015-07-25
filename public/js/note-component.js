@@ -2,7 +2,8 @@ var NoteItem  = React.createClass({
     render: function() {
 	return (
 	    <li className="note-item">
-		{this.props.text}
+		<input type="checkbox" checked={this.props.checked==="true"} onChange={function() { return false; }} />
+	        {this.props.text}
 	    </li>
 	);
     }
@@ -15,15 +16,13 @@ var Note = React.createClass({
     componentDidMount: function () {
 	var url = "notes/" + location.queryParams["note"] + "/items";
 	$.get(url).done(function(data) {
-	    console.log(data);
 	    this.setState({data: {items: data}});
 	}.bind(this));
     },
     render: function() {
 	var items = this.state.data.items.map(function(item) {
-	    console.log(item);
 	    return (
-		    <NoteItem text={item.text} />
+		    <NoteItem text={item.text} checked={item["checked?"]} key={item.id}/>
 	    );
 	});
 	return (

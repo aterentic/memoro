@@ -29,13 +29,13 @@
 (defresource note [identificator]
   :allowed-methods [:get]
   :exists? (fn [ctx] (if-let [id (notes/find-note identificator)] {::id id}))
-  :available-media-types ["application/json", "text/html"]
-  :handle-ok (fn [ctx]
-               (condp = (media-type ctx)
-                 "application/json" 
-                 (json/write-str (notes/get-note identificator) :escape-slash false)
-                 "text/html"
-                 (slurp "./public/note.html"))))
+  :available-media-types ["application/json"]
+  :handle-ok (fn [ctx](json/write-str (notes/get-note identificator) :escape-slash false)))
+
+;(defresource note [identificator]
+;  :allowed-methods [:get]
+;  :available-media-types ["text/html"]
+;  :handle-ok (fn [ctx] (slurp "./public/note.html")))
 
 (defresource items [note]
   :allowed-methods [:get :post]

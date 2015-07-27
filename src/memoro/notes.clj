@@ -25,7 +25,10 @@
     (db/persist-entity {:note/identificator identificator}) identificator))
 
 (defn get-note [identificator]
-  (map-keys (db/read-entity (find-note identificator)) note-keys))
+  (let [note (db/read-entity (find-note identificator))]
+    (merge
+     (map-keys note note-keys)
+     {:note/items (map #(map-keys % item-keys) (:note/items note))})))
 
 (defn get-items [note]
   (map (fn [item] (map-keys item item-keys)) (:note/items (db/read-entity (find-note note)))))
